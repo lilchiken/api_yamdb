@@ -2,6 +2,7 @@ from django.db import models
 
 from reviews.validators import validate_custom_year
 
+
 class Genre(models.Model):
     name = models.CharField(
         max_length=256,
@@ -11,7 +12,7 @@ class Genre(models.Model):
     slug = models.SlugField(
         max_length=50,
         unique=True,
-    )    
+    )
 
     class Meta:
         ordering = ['-id']
@@ -30,9 +31,8 @@ class Category(models.Model):
     )
     slug = models.SlugField(
         unique=True,
-        max_length=50,        
+        max_length=50,
     )
-
 
     class Meta:
         ordering = ['-id']
