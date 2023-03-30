@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
@@ -34,7 +33,10 @@ class Review(models.Model):
 
     class Meta:
         default_related_name = 'reviews'
-        ordering = ['pub_date']
+        ordering = ['-pub_date']
+
+    def __str__(self):
+        return self.text
 
 
 class Comment(models.Model):
@@ -55,4 +57,7 @@ class Comment(models.Model):
 
     class Meta:
         default_related_name = 'comments'
-        ordering = ['pub_date']
+        ordering = ['-pub_date']
+
+    def __str__(self):
+        return self.text
