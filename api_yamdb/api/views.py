@@ -11,7 +11,6 @@ from api.serializers import (GenreSerializer, CategorySerializer,
                              CommentSerializer, ReviewSerializer)
 
 
-
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
@@ -51,7 +50,7 @@ class TitleViewSet(viewsets.ModelViewSet):
         if self.request.method in permissions.SAFE_METHODS:
             return TitleGetSerializer
         return TitlePostSerializer
-    
+
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer

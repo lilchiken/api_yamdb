@@ -5,6 +5,7 @@ from django.core.validators import (MaxValueValidator, MinValueValidator)
 
 from reviews.validators import validate_custom_year
 
+
 class User(AbstractUser):
     """Обычный юзер джанго,
     но с двумя дополнительными полями ("role", "bio").
@@ -128,7 +129,6 @@ class Review(models.Model):
         db_index=True
     )
 
-
     class Meta:
         default_related_name = 'reviews'
         ordering = ['-pub_date']
@@ -153,11 +153,9 @@ class Comment(models.Model):
         db_index=True
     )
 
-
     class Meta:
         default_related_name = 'comments'
         ordering = ['-pub_date']
 
     def __str__(self):
         return self.text
-
