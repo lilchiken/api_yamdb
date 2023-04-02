@@ -1,34 +1,62 @@
-from rest_framework import (viewsets, status, permissions,
-                            filters, serializers, mixins)
-from rest_framework.decorators import (action, api_view, permission_classes)
+from rest_framework import (
+    viewsets,
+    status,
+    permissions,
+    filters,
+    serializers,
+    mixins
+)
+from rest_framework.decorators import (
+    action,
+    api_view,
+    permission_classes
+)
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import AccessToken
 from rest_framework.filters import SearchFilter
-
 from django.core.mail import send_mail
 from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg
 from django.db import IntegrityError
 from django_filters.rest_framework import DjangoFilterBackend
+from django.conf import settings
 
-from reviews.models import (Category, Genre,
-                            Review, Title, User)
-
-from api.serializers import (UserSerializer, SignUpSerializer,
-                             GetTokenSerializer, CategorySerializer,
-                             GenreSerializer, TitleSerializer,
-                             CommentSerializer, ReviewSerializer,
-                             TitleSerializerGet)
-
-from api.permissions import (IsAdmin, IsAdminOrReadOnly,
-                             IsAdminAuthorOrReadOnly)
-
+from reviews.models import (
+    Category,
+    Genre,
+    Review,
+    Title,
+    User
+)
+from api.serializers import (
+    UserSerializer,
+    SignUpSerializer,
+    GetTokenSerializer,
+    CategorySerializer,
+    GenreSerializer,
+    TitleSerializer,
+    CommentSerializer,
+    ReviewSerializer,
+    TitleSerializerGet
+)
+from api.permissions import (
+    IsAdmin,
+    IsAdminOrReadOnly,
+    IsAdminAuthorOrReadOnly
+)
 from api.filters import TitleFilter
 
-from api_yamdb.settings import DOMAIN_NAME
+
+class CreateDestroyListViewSet(
+    mixins.CreateModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.ListModelMixin,
+    viewsets.GenericViewSet
+):
+    pass
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -70,13 +98,13 @@ def signup(request):
     username = serializer.validated_data['username']
     email = serializer.validated_data['email']
     try:
-        user, created = User.objects.get_or_create(username=username,
+        user, _ = User.objects.get_or_create(username=username,
                                                    email=email)
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
             'Код подтверждения',
             f'Ваш код подтверждения: {confirmation_code}',
-            DOMAIN_NAME,
+            settings.DOMAIN_NAME,
             [user.email],
             fail_silently=False,
         )
@@ -100,7 +128,7 @@ def get_token(request):
     username = serializer.validated_data['username']
     confirmation_code = serializer.validated_data['confirmation_code']
     user = get_object_or_404(User, username=username)
-    if default_token_generator. check_token(user, confirmation_code):
+    if default_token_generator.check_token(user, confirmation_code):
         token = str(AccessToken.for_user(user))
         return Response({'token': token}, status=status.HTTP_200_OK)
     raise serializers.ValidationError('Введен неверный код.')
@@ -112,7 +140,8 @@ class TitleViewSet(viewsets.ModelViewSet):
     Метод Avg (среднее арифметическое).
     """
     queryset = Title.objects.all().annotate(
-        Avg('reviews__score')).order_by('name')
+        Avg('reviews__score')
+    ).order_by('name')
     serializer_class = TitleSerializer
     permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend,)
@@ -129,19 +158,21 @@ class TitleViewSet(viewsets.ModelViewSet):
         return TitleSerializer
 
 
-class CategoryViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
-                      mixins.ListModelMixin, viewsets.GenericViewSet):
+class CategoryViewSet(
+    CreateDestroyListViewSet
+):
     """Класс взаимодействия с моделью Category."""
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (IsAdminOrReadOnly, )
+    permission_classes = (IsAdminOrReadOnly,)
     filter_backends = (DjangoFilterBackend, SearchFilter)
     search_fields = ('name',)
     lookup_field = 'slug'
 
 
-class GenreViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
-                   mixins.ListModelMixin, viewsets.GenericViewSet):
+class GenreViewSet(
+    CreateDestroyListViewSet
+):
     """Класс взаимодействия с моделью Genre."""
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
@@ -154,7 +185,7 @@ class GenreViewSet(mixins.CreateModelMixin, mixins.DestroyModelMixin,
 class ReviewViewSet(viewsets.ModelViewSet):
     """Класс взаимодействия с моделью Review."""
     serializer_class = ReviewSerializer
-    permission_classes = (IsAdminAuthorOrReadOnly, )
+    permission_classes = (IsAdminAuthorOrReadOnly,)
 
     def get_queryset(self):
         title = get_object_or_404(Title, pk=self.kwargs.get('title_id'))
@@ -169,7 +200,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 class CommentViewSet(viewsets.ModelViewSet):
     """Класс взаимодействия с моделью Comment."""
     serializer_class = CommentSerializer
-    permission_classes = (IsAdminAuthorOrReadOnly, )
+    permission_classes = (IsAdminAuthorOrReadOnly,)
 
     def get_queryset(self):
         review = get_object_or_404(Review, pk=self.kwargs.get('review_id'))

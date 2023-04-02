@@ -5,9 +5,14 @@ from reviews.models import Title
 
 class TitleFilter(django_filters.FilterSet):
     """Класс для фильтрации обьектов Titles."""
-    genre = django_filters.CharFilter(field_name='genre', lookup_expr='slug')
-    category = django_filters.CharFilter(field_name='category',
-                                         lookup_expr='slug')
+    genre = django_filters.CharFilter(
+        field_name='genre',
+        lookup_expr='slug'
+    )
+    category = django_filters.CharFilter(
+        field_name='category',
+        lookup_expr='slug'
+    )
     year = django_filters.NumberFilter(field_name='year')
     name = django_filters.CharFilter(
         field_name='name',
@@ -15,4 +20,9 @@ class TitleFilter(django_filters.FilterSet):
 
     class Meta:
         model = Title
-        fields = ('genre', 'category', 'year', 'name', )
+        fields = (
+            'genre',
+            'category',
+            'year',
+            'name'
+        )

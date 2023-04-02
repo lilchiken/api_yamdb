@@ -3,8 +3,14 @@ from rest_framework.validators import UniqueValidator
 from rest_framework.exceptions import ValidationError
 from rest_framework.generics import get_object_or_404
 
-from reviews.models import (Category, Comment, Genre,
-                            Review, Title, User)
+from reviews.models import (
+    Category,
+    Comment,
+    Genre,
+    Review,
+    Title,
+    User
+)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -22,8 +28,14 @@ class UserSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('username', 'email', 'first_name',
-                  'last_name', 'bio', 'role',)
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role',
+        )
         model = User
 
     def validate_username(self, value):
@@ -102,7 +114,10 @@ class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        fields = ('name', 'slug',)
+        fields = (
+            'name',
+            'slug',
+        )
 
 
 class TitleSerializerGet(TitleSerializer):
@@ -110,7 +125,8 @@ class TitleSerializerGet(TitleSerializer):
        (получение списка произведений с рейтингом).
     """
     rating = serializers.IntegerField(
-        source='reviews__score__avg', read_only=True
+        source='reviews__score__avg',
+        read_only=True
     )
     category = CategorySerializer()
     genre = GenreSerializer(many=True, read_only=True)
@@ -136,8 +152,10 @@ class ReviewSerializer(serializers.ModelSerializer):
             if Review.objects.filter(
                 title=title, author=request.user
             ).exists():
-                raise ValidationError('Вы не можете добавить более'
-                                      'одного отзыва на произведение')
+                raise ValidationError(
+                    'Вы не можете добавить более'
+                    'одного отзыва на произведение'
+                )
         return data
 
     def validate_score(self, value):

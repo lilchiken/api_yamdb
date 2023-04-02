@@ -1,30 +1,43 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser
+from django.core.validators import (
+    MaxValueValidator,
+    MinValueValidator
+)
 
 from reviews.validators import validate_for_year
-
-from django.contrib.auth.models import AbstractUser
-
-from django.core.validators import (MaxValueValidator,
-                                    MinValueValidator)
-
-ROLE_CHOICES = (
-               ('user', 'Пользователь'),
-               ('moderator', 'Модератор'),
-               ('admin', 'Администратор'),
-)
 
 
 class User(AbstractUser):
     """Кастомная модель User пользователя
        с дополнительными полями bio и role.
     """
-    username = models.CharField(blank=False, max_length=150,
-                                unique=True)
-    email = models.EmailField(blank=False, max_length=254,
-                              unique=True)
-    bio = models.TextField(blank=True, verbose_name='Биография')
-    role = models.CharField(choices=ROLE_CHOICES, max_length=16,
-                            default='user', verbose_name='Роль')
+    ROLE_CHOICES = (
+        ('user', 'Пользователь'),
+        ('moderator', 'Модератор'),
+        ('admin', 'Администратор'),
+    )
+
+    username = models.CharField(
+        blank=False,
+        max_length=150,
+        unique=True
+    )
+    email = models.EmailField(
+        blank=False,
+        max_length=254,
+        unique=True
+    )
+    bio = models.TextField(
+        blank=True,
+        verbose_name='Биография'
+    )
+    role = models.CharField(
+        choices=ROLE_CHOICES,
+        max_length=16,
+        default='user',
+        verbose_name='Роль'
+    )
 
     def __str__(self):
         return self.username

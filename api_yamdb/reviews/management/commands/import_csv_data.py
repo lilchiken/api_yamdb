@@ -2,6 +2,7 @@ import csv
 import logging
 
 from django.core.management.base import BaseCommand, CommandError
+
 from reviews.models import Category, Genre, Title, User, Review, Comment
 
 
