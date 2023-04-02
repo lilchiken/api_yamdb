@@ -1,24 +1,33 @@
 from rest_framework import permissions
 
 
-class IsModeratorAdminOwner(permissions.BasePermission):
-    """Доступ модератору, админу или автору объекта (field "author")."""
-
+class IsAdmin(permissions.BasePermission):
+    """Доступ разрешен только администраторам."""
     def has_permission(self, request, view):
-        if request.user.is_authenticated:
-            return True
-        return False
-
-    def has_object_permission(self, request, view, obj):
-        if (
-            request.user.role in ('moderator', 'admin')
-            or obj.author == request.user
-        ):
-            return True
-        return False
+        return (request.user.is_authenticated
+                and request.user.is_admin)
 
 
-class IsAuthorOrReadOnly(permissions.BasePermission):
+class IsAdminOrReadOnly(permissions.BasePermission):
+    """Доступ на чтение разрешен всем, на изменение - администраторам."""
+    def has_permission(self, request, view):
+        return (request.method in permissions.SAFE_METHODS
+                or (request.user.is_authenticated
+                    and request.user.is_admin))
+
+
+class IsAdminAuthorOrReadOnly(permissions.BasePermission):
+    """
+    Доступ к чтению списков разрешен всем, изменению - авторизованным
+    пользователям. Доступ к чтению объектов разрешен всем, к изменению -
+    автору, модераторам или администраторам.
+    """
+    def has_permission(self, request, view):
+        return (request.method in permissions.SAFE_METHODS
+                or request.user.is_authenticated)
+
     def has_object_permission(self, request, view, obj):
         return (request.method in permissions.SAFE_METHODS
-                or obj.author == request.user)
+                or (request.user.is_admin
+                    or request.user.is_moderator
+                    or obj.author == request.user))
