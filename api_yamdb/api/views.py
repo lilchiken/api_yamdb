@@ -63,6 +63,7 @@ class UserViewSet(viewsets.ModelViewSet):
     """Администратор получает список пользователей, может создавать
     пользователя. Пользователь по url 'users/me/' может получать и изменять
      свои данные, кроме поля 'Роль'."""
+
     queryset = User.objects.all()
     serializer_class = UserSerializer
     http_method_names = ['get', 'post', 'patch', 'delete']
@@ -72,15 +73,22 @@ class UserViewSet(viewsets.ModelViewSet):
     lookup_field = 'username'
     pagination_class = PageNumberPagination
 
-    @action(methods=('get', 'patch'), detail=False, url_path='me',
-            permission_classes=(permissions.IsAuthenticated,))
+    @action(
+        methods=('get', 'patch'),
+        detail=False,
+        url_path='me',
+        permission_classes=(permissions.IsAuthenticated,)
+    )
     def user_own_account(self, request):
         user = request.user
         if request.method == 'GET':
             serializer = self.get_serializer(user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        serializer = self.get_serializer(user, data=request.data,
-                                         partial=True)
+        serializer = self.get_serializer(
+            user,
+            data=request.data,
+            partial=True
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save(role=user.role, partial=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -93,13 +101,16 @@ def signup(request):
     Пользователь отправляет свои 'username' и 'email' на 'auth/signup/ и
     получает код подтверждения на email.
     """
+
     serializer = SignUpSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     username = serializer.validated_data['username']
     email = serializer.validated_data['email']
     try:
-        user, _ = User.objects.get_or_create(username=username,
-                                                   email=email)
+        user, _ = User.objects.get_or_create(
+            username=username,
+            email=email
+        )
         confirmation_code = default_token_generator.make_token(user)
         send_mail(
             'Код подтверждения',
@@ -123,6 +134,7 @@ def get_token(request):
     Пользователь отправляет свои 'username' и 'confirmation_code'
     на 'auth/token/ и получает токен.
     """
+
     serializer = GetTokenSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     username = serializer.validated_data['username']
@@ -139,6 +151,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     С помощью аннотации добавляем поле рейтинга к каждому объекту модели.
     Метод Avg (среднее арифметическое).
     """
+
     queryset = Title.objects.all().annotate(
         Avg('reviews__score')
     ).order_by('name')
@@ -162,6 +175,7 @@ class CategoryViewSet(
     CreateDestroyListViewSet
 ):
     """Класс взаимодействия с моделью Category."""
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = (IsAdminOrReadOnly,)
@@ -174,6 +188,7 @@ class GenreViewSet(
     CreateDestroyListViewSet
 ):
     """Класс взаимодействия с моделью Genre."""
+
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
     permission_classes = (IsAdminOrReadOnly,)
@@ -184,6 +199,7 @@ class GenreViewSet(
 
 class ReviewViewSet(viewsets.ModelViewSet):
     """Класс взаимодействия с моделью Review."""
+
     serializer_class = ReviewSerializer
     permission_classes = (IsAdminAuthorOrReadOnly,)
 
@@ -199,6 +215,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     """Класс взаимодействия с моделью Comment."""
+
     serializer_class = CommentSerializer
     permission_classes = (IsAdminAuthorOrReadOnly,)
 

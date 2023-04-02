@@ -149,11 +149,13 @@ class Affiliation(models.Model):
     title = models.ForeignKey(
         Title,
         verbose_name='Произведение',
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE
+    )
     genre = models.ForeignKey(
         Genre,
         verbose_name='Жанр',
-        on_delete=models.CASCADE)
+        on_delete=models.CASCADE
+    )
 
     class Meta:
         verbose_name = 'Произведение и его жанр'
