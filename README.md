@@ -35,4 +35,6 @@ python manage.py runserver
 Там вы можете ознакомиться с эндпоинтами и методами, а также с примерами запросов, ответов и кода.
 
 ## Авторы
-lilchiken, Matf2six, itsqntz
+Илья Андрюхин lilchiken
+Михаил Матвеев Matf2six
+Никита Истомин itsqntz
